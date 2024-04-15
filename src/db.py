@@ -4,17 +4,22 @@ from psycopg.cursor import Cursor
 from src.models import Book
 
 
-@contextmanager
 def get_cur() -> Cursor:
     pass
 
 
 def get_all_books() -> list[Book]:
-    with get_cur() as cur:
-        cur.execute("SELECT * FROM book")
-        book_tups = cur.fetchall()
+    cur = get_cur()
+    cur.execute("SELECT * FROM book")
+    book_tups = cur.fetchall()
     books = [Book(*book_tup) for book_tup in book_tups]
     return books
+
+
+def insert_book(book: Book) -> None:
+    cur = get_cur()
+    cur.execute("INSERT INTO book(id, title, rating) VALUES(%s, %s, %s)", (book.id, book.title, book.rating))
+    cur.connection.commit()
 
 
 
